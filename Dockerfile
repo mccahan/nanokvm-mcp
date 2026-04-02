@@ -2,16 +2,12 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# Install dependencies
-COPY pyproject.toml ./
-RUN pip install --no-cache-dir hatchling && \
-    pip install --no-cache-dir fastapi uvicorn httpx websockets pycryptodome pillow
-
-# Copy application
+# Copy project files needed for install
+COPY pyproject.toml README.md ./
 COPY nanokvm_mcp/ ./nanokvm_mcp/
 
 # Install the package
-RUN pip install --no-cache-dir -e .
+RUN pip install --no-cache-dir .
 
 # Default environment variables
 ENV NANOKVM_HOST=10.0.1.117 \
