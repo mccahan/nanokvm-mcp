@@ -267,7 +267,10 @@ class NanoKVMClient:
     async def _get_websocket(self) -> websockets.WebSocketClientProtocol:
         """Get or create WebSocket connection."""
         async with self._ws_lock:
-            if self._ws is None or self._ws.closed:
+            # Check if websocket needs to be created/reconnected
+            # websockets 12+ uses .state, older versions use .closed
+            ws_closed = self._ws is None or getattr(self._ws, 'closed', None) or (hasattr(self._ws, 'state') and self._ws.state.name != 'OPEN')
+            if ws_closed:
                 await self._ensure_authenticated()
 
                 # Build cookie header
