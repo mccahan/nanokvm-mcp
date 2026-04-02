@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  nanokvm-api:
+    image: ghcr.io/mccahan/nanokvm-mcp:latest
+    container_name: nanokvm-api
+    restart: unless-stopped
+    ports:
+      - "8117:8080"
+    environment:
+      - NANOKVM_HOST=10.0.1.117
+      - NANOKVM_USERNAME=admin
+      - NANOKVM_PASSWORD=helloworld12
+      - NANOKVM_SCREEN_WIDTH=1920
+      - NANOKVM_SCREEN_HEIGHT=1080
+      - NANOKVM_USE_HTTPS=false
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
