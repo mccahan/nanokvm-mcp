@@ -133,6 +133,18 @@ async def get_hdmi_status():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/resolution")
+async def get_resolution():
+    """Detect and return actual screen resolution from screenshot."""
+    try:
+        client = get_client()
+        width, height = await client.detect_resolution()
+        return {"status": "ok", "data": {"width": width, "height": height}}
+    except Exception as e:
+        logger.exception("Failed to detect resolution")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # --- Screenshot ---
 
 @app.get("/screenshot")

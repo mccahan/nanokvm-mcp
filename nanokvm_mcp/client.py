@@ -356,14 +356,28 @@ class NanoKVMClient:
 
             await asyncio.sleep(0.03)
 
-    async def mouse_move(self, x: int, y: int) -> None:
+    async def detect_resolution(self) -> tuple[int, int]:
+        """
+        Detect actual screen resolution from a screenshot.
+        Updates internal screen_width/screen_height and returns (width, height).
+        """
+        img = await self.screenshot_pil()
+        self.screen_width, self.screen_height = img.size
+        logger.info(f"Detected resolution: {self.screen_width}x{self.screen_height}")
+        return self.screen_width, self.screen_height
+
+    async def mouse_move(self, x: int, y: int, auto_detect: bool = True) -> None:
         """
         Move mouse to absolute position.
 
         Args:
             x: X coordinate (0 to screen_width)
             y: Y coordinate (0 to screen_height)
+            auto_detect: If True, detect resolution from screenshot first
         """
+        if auto_detect:
+            await self.detect_resolution()
+        
         # Convert screen coordinates to NanoKVM coordinates (1-32768)
         kvm_x = int((x / self.screen_width) * 0x7FFE) + 1
         kvm_y = int((y / self.screen_height) * 0x7FFE) + 1
